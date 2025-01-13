@@ -5,18 +5,15 @@ mod handlers;
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
 use crate::config::{load_config};  // 导入config模块中的init和load_config
-use tracing::{info, trace, error};
+use tracing::{error, info, trace, Level};
 use tracing_subscriber::FmtSubscriber;
 
 #[tokio::main]
 async fn main() {
     // 初始化日志记录器
-    tracing::subscriber::set_global_default(
-        FmtSubscriber::new()
-    ).expect("setting default subscriber failed");
-    // 加载配置an
+    tracing_subscriber::fmt().with_max_level(Level::TRACE).init();
+    // 加载配置
     let config = load_config();
-
     let address = &config.server.address;
     let service_name = &config.server.name;
 
@@ -27,10 +24,11 @@ async fn main() {
     // 创建监听器
     let listener = TcpListener::bind(address)
         .await
-        .unwrap_or_else(|e| panic!("Failed to bind to address {}: {}", address, e));
-
-    println!("Listening on {}", address);
-    info!("启动服务");
+        .unwrap_or_else(|e| {
+            error!("Failed to bind to address {}: {}", address, e);
+            panic!("Failed to bind to address {}: {}", address, e)
+        });
+    info!("启动服务,Listening on {}", address);
     // 启动服务器
     axum::serve(listener, app).await.unwrap();
 }
