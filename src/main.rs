@@ -19,7 +19,13 @@ async fn main() {
 
     // 创建主应用程序路由，加载所有子路由，并传递服务名称作为前缀
     let app = routers::create_routes(&service_name);
-    
+    let git_sha = option_env!("VERGEN_GIT_SHA").unwrap_or("unknown");
+    let git_branch = option_env!("VERGEN_GIT_BRANCH").unwrap_or("unknown");
+    let build_timestamp = option_env!("VERGEN_BUILD_TIMESTAMP").unwrap_or("unknown");
+
+    println!("Current Git SHA: {}", git_sha);
+    println!("Current Git Branch: {}", git_branch);
+    println!("Build Timestamp: {}", build_timestamp);
     
     // 创建监听器
     let listener = TcpListener::bind(address)
