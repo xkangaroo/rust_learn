@@ -1,0 +1,19 @@
+[package]
+name = "test_song"
+version = "0.1.0"
+edition = "2021"
+[dependencies]
+axum = "0.8.1"
+bytes = "1.9.0"
+config = "0.15.4"
+env_logger = "0.11.6"
+include_dir = "0.7.4"
+log = "0.4.22"
+serde = "1.0.217"
+serde_derive = "1.0.217"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+toml = "0.8.19"
+tracing = "0.1.37"
+tracing-subscriber = "0.3.17"
+vergen = "9.0.2"
+
