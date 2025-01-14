@@ -1,13 +1,17 @@
 mod config;  // 确保这里声明了config模块
 mod routers;
 mod handlers;
+mod common;
 
+use common::*;
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
+use version_info::VersionInfoProvider;
 use crate::config::{load_config};  // 导入config模块中的init和load_config
 use tracing::{error, info, trace, Level};
 use tracing_subscriber::FmtSubscriber;
-use git_version::git_version;
+
+
 #[tokio::main]
 async fn main() {
     // 初始化日志记录器
@@ -20,10 +24,15 @@ async fn main() {
     // 创建主应用程序路由，加载所有子路由，并传递服务名称作为前缀
     let app = routers::create_routes(&service_name);
 
-
-    const VERSION: &str = git_version!();
-    println!("{VERSION}");
-
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 && args[1] == "-v" {
+        let provider = version_info::GitVersionInfoProvider; // 确保这里的名称与定义一致
+        match provider.get_version_info() {
+            Ok(version_info) => version_info.print(),
+            Err(e) => eprintln!("Error getting version info: {}", e),
+        }
+        return;
+    }
     // 创建监听器
     let listener = TcpListener::bind(address)
         .await
